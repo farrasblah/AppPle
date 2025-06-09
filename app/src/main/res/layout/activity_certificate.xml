@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- App Title -->
+
+    <!-- Instruction Text -->
+
+
+    <!-- Photo Capture and Gallery Buttons -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="52dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="start|center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="68dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Logo Apel"
+            android:src="@drawable/apple" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AppPle"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="start"
+        android:text="Deteksi apel mu !"
+        android:textAlignment="viewStart"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- Photo Capture Button -->
+        <LinearLayout
+            android:id="@+id/button_photo_capture"
+            android:layout_width="182dp"
+            android:layout_height="114dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_background"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_camera" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Photo Capture"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Gallery Button -->
+        <LinearLayout
+            android:id="@+id/button_gallery"
+            android:layout_width="184dp"
+            android:layout_height="114dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_background"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_gallery" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gallery"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Learn More Section -->
+
+    <!-- Cari Tahu Button -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Lebih Lanjut"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/button_learn_more"
+        android:layout_width="match_parent"
+        android:layout_height="113dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#D32F2F"
+        android:text="Cari Tahu!\nPelajari lebih lanjut tentang apel"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/button_about"
+        android:layout_width="match_parent"
+        android:layout_height="109dp"
+        android:backgroundTint="#D32F2F"
+        android:text="About AppPle"
+        android:textSize="16sp" />
+</LinearLayout>
