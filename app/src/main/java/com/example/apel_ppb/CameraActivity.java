@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -31,11 +34,11 @@ import java.util.Date;
 import java.util.Locale;
 
 public class CameraActivity extends AppCompatActivity {
-    private static final int REQUEST_CAMERA = 100;
     private static final int REQUEST_PERMISSIONS = 101;
     private ImageView imageView;
     private Uri photoUri;
     private String currentPhotoPath;
+    private ActivityResultLauncher<Intent> cameraActivityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +48,26 @@ public class CameraActivity extends AppCompatActivity {
         Button takePhotoButton = findViewById(R.id.button);
         imageView = findViewById(R.id.imageView);
 
-        takePhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (hasPermissions()) {
-                    openCamera();
-                } else {
-                    requestPermissions();
-                }
+        // Initialize ActivityResultLauncher
+        cameraActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 2;
+                        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
+                        imageView.setImageBitmap(bitmap);
+
+                        saveToGallery(bitmap);
+                        Toast.makeText(this, "Foto disimpan di galeri", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        takePhotoButton.setOnClickListener(view -> {
+            if (hasPermissions()) {
+                openCamera();
+            } else {
+                requestPermissions();
             }
         });
     }
@@ -95,7 +110,7 @@ public class CameraActivity extends AppCompatActivity {
                         photoFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                startActivityForResult(cameraIntent, REQUEST_CAMERA);
+                cameraActivityResultLauncher.launch(cameraIntent);
             }
         }
     }
@@ -108,21 +123,6 @@ public class CameraActivity extends AppCompatActivity {
         File image = new File(storageDir, fileName);
         currentPhotoPath = image.getAbsolutePath();
         return image;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2;
-            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
-            imageView.setImageBitmap(bitmap);
-
-            saveToGallery(bitmap); // disimpan ke galeri
-
-            Toast.makeText(this, "Foto disimpan di galeri", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void saveToGallery(Bitmap bitmap) {
@@ -156,11 +156,8 @@ public class CameraActivity extends AppCompatActivity {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
                 }
 
-                // Tambahkan ke galeri
-                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                Uri contentUri = Uri.fromFile(file);
-                mediaScanIntent.setData(contentUri);
-                sendBroadcast(mediaScanIntent);
+                // Replace deprecated ACTION_MEDIA_SCANNER_SCAN_FILE
+                MediaScannerConnection.scanFile(this, new String[]{file.getAbsolutePath()}, null, null);
             }
         } catch (IOException e) {
             e.printStackTrace();

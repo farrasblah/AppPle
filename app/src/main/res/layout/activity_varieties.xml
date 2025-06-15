@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFF5F5">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AppPle"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#D32F2F"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jenis-jenis Apel Konsumsi"
+            android:textSize="18sp"
+            android:textColor="#4CAF50"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Apel Fuji: Rasanya manis dengan tekstur renyah, berasal dari Jepang."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/apel_fuji"
+                android:contentDescription="Foto Apel Fuji"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2. Apel Granny Smith: Hijau dan asam, cocok untuk masakan."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/apel_granny"
+                android:contentDescription="Foto Apel Granny Smith"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="3. Apel Gala: Manis dan merah muda, ideal untuk dimakan langsung."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/apel_royal"
+                android:contentDescription="Foto Apel Gala"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4. Apel Pink Lady: Kombinasi manis dan asam dengan warna merah cerah."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/apel_lady"
+                android:contentDescription="Foto Apel Pink Lady"
+                android:scaleType="centerCrop" />
+        </LinearLayout>
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:backgroundTint="#D32F2F"
+            android:text="Kembali"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

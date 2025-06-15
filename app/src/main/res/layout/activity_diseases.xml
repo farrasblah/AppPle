@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFF5F5">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AppPle"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#D32F2F"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Penyakit pada Tanaman Apel"
+            android:textSize="18sp"
+            android:textColor="#4CAF50"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Apple Scab: Jamur yang menyebabkan bintik hitam pada daun dan buah."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:contentDescription="Foto Apple Scab"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2. Fire Blight: Penyakit bakteri yang menyerang cabang dan bunga."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:contentDescription="Foto Fire Blight"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="3. Powdery Mildew: Jamur putih yang mengganggu pertumbuhan daun."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:contentDescription="Foto Powdery Mildew"
+                android:scaleType="centerCrop"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4. Cedar Apple Rust: Penyakit yang menyebabkan bintik oranye pada daun."
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:contentDescription="Foto Cedar Apple Rust"
+                android:scaleType="centerCrop" />
+        </LinearLayout>
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:backgroundTint="#D32F2F"
+            android:text="Kembali"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

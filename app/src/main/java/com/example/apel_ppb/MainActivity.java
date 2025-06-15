@@ -54,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         galleryButton.setOnClickListener(v -> openGalleryWithPermissionCheck());
 
         learnMoreButton.setOnClickListener(v -> {
-            // TODO: Tambahkan logika tombol "Cari Tahu!"
+            Intent learnMoreIntent = new Intent(MainActivity.this, LearnMoreActivity.class);
+            startActivity(learnMoreIntent);
         });
 
         aboutButton.setOnClickListener(v -> {

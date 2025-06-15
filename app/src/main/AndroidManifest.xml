@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +22,18 @@
         android:theme="@style/Theme.Apel_ppb"
         tools:targetApi="31">
         <activity
+            android:name=".CareTipsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DiseasesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VarietiesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LearnMoreActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Apel_ppb">
@@ -30,7 +43,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CheckingImages"/>
+        <activity android:name=".HealthyAppleInfoActivity" />
+        <activity android:name=".RottenAppleInfoActivity" />
+        <activity android:name=".ScabbyAppleInfoActivity" />
+        <activity android:name=".CheckingImages" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -41,8 +57,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-
     </application>
 
 </manifest>

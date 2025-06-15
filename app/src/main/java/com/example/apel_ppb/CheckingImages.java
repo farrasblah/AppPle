@@ -1,6 +1,11 @@
 package com.example.apel_ppb;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -21,11 +26,15 @@ import java.util.Date;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 
 public class CheckingImages extends AppCompatActivity {
 
@@ -35,6 +44,7 @@ public class CheckingImages extends AppCompatActivity {
     private String source;
     private Uri imageUri;
     private File photoFile;
+    private ImageView imageView;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
     private ActivityResultLauncher<Intent> galleryLauncher;
@@ -43,16 +53,15 @@ public class CheckingImages extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checking_images);
-        ImageView imageView = findViewById(R.id.image_preview);
+        imageView = findViewById(R.id.image_preview);
         Button scanButton = findViewById(R.id.button_scan);
         Button editButton = findViewById(R.id.button_edit);
 
-        // Initialize Activity Result Launchers
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-                        ImageView imageViewResult = findViewById(R.id.image_preview);
-                        imageViewResult.setImageURI(imageUri);
+                        imageView.setImageURI(imageUri);
+                        scanImage(imageUri);
                     }
                 });
 
@@ -60,8 +69,8 @@ public class CheckingImages extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         imageUri = result.getData().getData();
-                        ImageView imageViewResult = findViewById(R.id.image_preview);
-                        imageViewResult.setImageURI(imageUri);
+                        imageView.setImageURI(imageUri);
+                        scanImage(imageUri);
                     }
                 });
 
@@ -78,52 +87,7 @@ public class CheckingImages extends AppCompatActivity {
 
         scanButton.setOnClickListener(view -> {
             if (imageUri != null) {
-                new Thread(() -> {
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            byteArrayOutputStream.write(buffer, 0, bytesRead);
-                        }
-                        inputStream.close();
-                        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-                        byteArrayOutputStream.close();
-
-                        String base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-
-                        OkHttpClient client = new OkHttpClient();
-                        RequestBody requestBody = new FormBody.Builder()
-                                .add("image", base64Image)
-                                .build();
-
-                        Request request = new Request.Builder()
-                                .url("https://serverless.roboflow.com/ppb-project/4?api_key=1BfhNCzUHY29nea0wtNU")
-                                .post(requestBody)
-                                .build();
-
-                        Response response = client.newCall(request).execute();
-                        if (response.isSuccessful()) {
-                            String jsonResponse = response.body().string();
-                            runOnUiThread(() -> {
-                                TextView resultText = findViewById(R.id.result_text);
-                                resultText.setText(jsonResponse);
-                            });
-                        } else {
-                            runOnUiThread(() -> {
-                                TextView resultText = findViewById(R.id.result_text);
-                                resultText.setText("Scan failed: " + response.code());
-                            });
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        runOnUiThread(() -> {
-                            TextView resultText = findViewById(R.id.result_text);
-                            resultText.setText("Error: " + e.getMessage());
-                        });
-                    }
-                }).start();
+                scanImage(imageUri);
             }
         });
 
@@ -153,9 +117,122 @@ public class CheckingImages extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // This method can be removed since we're using Activity Result API
+    private void scanImage(Uri uri) {
+        new Thread(() -> {
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(uri);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+                inputStream.close();
+                byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                byteArrayOutputStream.close();
+
+                RequestBody fileBody = RequestBody.create(imageBytes, MediaType.parse("image/jpeg"));
+                MultipartBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", "image.jpg", fileBody)
+                        .build();
+
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://serverless.roboflow.com/ppb-project/4?api_key=lBFhNCZuHY29NeaOwtNU")
+                        .post(requestBody)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    String jsonResponse = response.body().string();
+                    runOnUiThread(() -> {
+                        TextView resultText = findViewById(R.id.result_text);
+                        resultText.setText(jsonResponse);
+                        drawBoundingBoxes(jsonResponse, uri);
+                    });
+                } else {
+                    runOnUiThread(() -> {
+                        TextView resultText = findViewById(R.id.result_text);
+                        resultText.setText("Scan failed: " + response.code() + "\n" + response.message());
+                    });
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    TextView resultText = findViewById(R.id.result_text);
+                    resultText.setText("Error: " + e.getMessage());
+                });
+            }
+        }).start();
+    }
+
+    private void drawBoundingBoxes(String jsonResponse, Uri uri) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            JSONArray predictions = jsonObject.getJSONArray("predictions");
+
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Canvas canvas = new Canvas(mutableBitmap);
+            Paint paint = new Paint();
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(10f);
+
+            if (predictions.length() == 0) {
+                // Jika tidak ada deteksi
+                paint.setColor(Color.BLACK);
+                paint.setTextSize(150f);
+                canvas.drawText("Tidak ada objek terdeteksi", bitmap.getWidth() / 4, bitmap.getHeight() / 2, paint);
+            } else {
+                for (int i = 0; i < predictions.length(); i++) {
+                    JSONObject prediction = predictions.getJSONObject(i);
+                    float x = (float) prediction.getDouble("x");
+                    float y = (float) prediction.getDouble("y");
+                    float width = (float) prediction.getDouble("width");
+                    float height = (float) prediction.getDouble("height");
+                    String className = prediction.getString("class");
+                    float confidence = (float) prediction.getDouble("confidence");
+
+                    // Normalisasi koordinat ke ukuran bitmap
+                    float left = x - (width / 2);
+                    float top = y - (height / 2);
+                    float right = x + (width / 2);
+                    float bottom = y + (height / 2);
+
+                    // Sesuaikan dengan skala gambar
+                    float scaleX = bitmap.getWidth() / 4080f; // Asumsikan lebar maksimum gambar dari JSON
+                    float scaleY = bitmap.getHeight() / 2296f; // Asumsikan tinggi maksimum gambar dari JSON
+                    left *= scaleX;
+                    top *= scaleY;
+                    right *= scaleX;
+                    bottom *= scaleY;
+
+                    // Set warna berdasarkan class (contoh: hijau untuk "sehat")
+                    if ("sehat".equals(className)) {
+                        paint.setColor(Color.GREEN);
+                    } else {
+                        paint.setColor(Color.RED);
+                    }
+
+                    RectF rect = new RectF(left, top, right, bottom);
+                    canvas.drawRect(rect, paint);
+
+                    // Tambahkan teks confidence dan class
+                    paint.setColor(Color.WHITE);
+                    paint.setTextSize(100f);
+                    canvas.drawText(String.format("%s (%.2f%%)", className, confidence * 100), left, top - 20, paint);
+                }
+            }
+
+            runOnUiThread(() -> imageView.setImageBitmap(mutableBitmap));
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(() -> {
+                TextView resultText = findViewById(R.id.result_text);
+                resultText.setText("Error drawing boxes: " + e.getMessage());
+            });
+        }
     }
 
     private File createImageFile() throws IOException {
