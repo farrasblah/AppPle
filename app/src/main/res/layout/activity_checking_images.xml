@@ -36,6 +36,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Scan Results"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        android:textSize="16sp" />
 </LinearLayout>
