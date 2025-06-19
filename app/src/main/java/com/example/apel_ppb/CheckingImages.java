@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.provider.MediaStore;
@@ -56,6 +57,7 @@ public class CheckingImages extends AppCompatActivity {
         imageView = findViewById(R.id.image_preview);
         Button scanButton = findViewById(R.id.button_scan);
         Button editButton = findViewById(R.id.button_edit);
+        ImageButton backButton = findViewById(R.id.back_button);
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -115,6 +117,8 @@ public class CheckingImages extends AppCompatActivity {
                 galleryLauncher.launch(intentGallery);
             }
         });
+
+        backButton.setOnClickListener(v -> finish()); // Navigate back to previous activity
     }
 
     private void scanImage(Uri uri) {
@@ -139,7 +143,7 @@ public class CheckingImages extends AppCompatActivity {
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("https://serverless.roboflow.com/ppb-project/4?api_key=lBFhNCZuHY29NeaOwtNU")
+                        .url("https://serverless.roboflow.com/ppb-project/5?api_key=lBFhNCZuHY29NeaOwtNU")
                         .post(requestBody)
                         .build();
 
@@ -182,8 +186,8 @@ public class CheckingImages extends AppCompatActivity {
             if (predictions.length() == 0) {
                 // Jika tidak ada deteksi
                 paint.setColor(Color.BLACK);
-                paint.setTextSize(150f);
-                canvas.drawText("Tidak ada objek terdeteksi", bitmap.getWidth() / 4, bitmap.getHeight() / 2, paint);
+                paint.setTextSize(200f);
+                canvas.drawText("Oops! No apple detected", bitmap.getWidth() / 4, bitmap.getHeight() / 2, paint);
             } else {
                 for (int i = 0; i < predictions.length(); i++) {
                     JSONObject prediction = predictions.getJSONObject(i);

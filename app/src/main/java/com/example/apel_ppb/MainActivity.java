@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,22 +17,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_GALLERY_PERMISSION = 100;
     private static final int REQUEST_CODE_PICK_IMAGE = 101;
-
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 102;
     private static final int REQUEST_CODE_CAMERA = 103;
 
     private Uri photoUri;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +48,14 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout photoCaptureButton = findViewById(R.id.button_photo_capture);
         LinearLayout galleryButton = findViewById(R.id.button_gallery);
-        Button learnMoreButton = findViewById(R.id.button_learn_more);
-        Button aboutButton = findViewById(R.id.button_about);
+        Button seeAllButton = findViewById(R.id.button_see_all);
+        RecyclerView articleBannerRecyclerView = findViewById(R.id.article_banner_recycler_view);
+
+        // Set up RecyclerView for horizontal banners
+        articleBannerRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        List<Article> previewArticles = getSampleArticles();
+        ArticleBannerAdapter adapter = new ArticleBannerAdapter(previewArticles);
+        articleBannerRecyclerView.setAdapter(adapter);
 
         photoCaptureButton.setOnClickListener(v -> {
             if (hasCameraPermission()) {
@@ -53,16 +67,66 @@ public class MainActivity extends AppCompatActivity {
 
         galleryButton.setOnClickListener(v -> openGalleryWithPermissionCheck());
 
-        learnMoreButton.setOnClickListener(v -> {
-            Intent learnMoreIntent = new Intent(MainActivity.this, LearnMoreActivity.class);
-            startActivity(learnMoreIntent);
-        });
-
-        aboutButton.setOnClickListener(v -> {
-            // TODO: Tambahkan logika tombol "About AppPle"
+        seeAllButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ArticleFilterActivity.class);
+            startActivity(intent);
         });
     }
-//  CAMERA PERMISSION & OPEN CAMERA
+
+    // Adapter for RecyclerView
+    private class ArticleBannerAdapter extends RecyclerView.Adapter<ArticleBannerAdapter.ViewHolder> {
+        private List<Article> articles;
+
+        public ArticleBannerAdapter(List<Article> articles) {
+            this.articles = articles;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.banner_item, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Article article = articles.get(position);
+            holder.titleTextView.setText(article.getTitle());
+            holder.bannerImage.setImageResource(article.getImageResId());
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, LearnMoreActivity.class);
+                intent.putExtra("url", article.getUrl());
+                startActivity(intent);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return articles.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            TextView titleTextView;
+            ImageView bannerImage;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                titleTextView = itemView.findViewById(R.id.banner_title);
+                bannerImage = itemView.findViewById(R.id.banner_image);
+            }
+        }
+    }
+
+    // Fungsi untuk mengambil sample artikel
+    private List<Article> getSampleArticles() {
+        List<Article> articles = new ArrayList<>();
+        articles.add(new Article("Jarang Bertemu Dokter Berkat Apel", "fruit", "https://www.alodokter.com/jarang-bertemu-dokter-berkat-manfaat-apel ", R.drawable.apple_benefits));
+        articles.add(new Article("All Apple Varities", "fruit", "https://waapple.org/varieties/all/ ", R.drawable.apple_types));
+        articles.add(new Article("Common Apple Tree Disease and How to Treat Them", "diseases,care_tips", "https://plantmegreen.com/blogs/news/common-apple-tree-diseases-how-to-treat-them?srsltid=AfmBOooFE4wrS-Tddrn0GryYVECBxSY_Iy9EglfHgIEZLXM1QBTx26Xg ", R.drawable.apple_diseases));
+        return articles;
+    }
+
+    // CAMERA PERMISSION & OPEN CAMERA
     private boolean hasCameraPermission() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
@@ -76,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
     private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            // Membuat file gambar agar hasil kamera tersimpan
             File photoFile = null;
             try {
                 photoFile = createImageFile();
@@ -88,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (photoFile != null) {
                 photoUri = FileProvider.getUriForFile(this,
-                        getPackageName() + ".provider",  // pastikan ini sesuai di AndroidManifest.xml
+                        getPackageName() + ".provider",
                         photoFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -107,12 +170,12 @@ public class MainActivity extends AppCompatActivity {
         File storageDir = getExternalFilesDir(null);
         return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
-//    GALLERY PERMISSION & OPEN GALLERY
+
+    // GALLERY PERMISSION & OPEN GALLERY
     private boolean hasGalleryPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Android 10+ tidak perlu permission khusus untuk baca gambar
             return true;
         } else {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
@@ -158,6 +221,12 @@ public class MainActivity extends AppCompatActivity {
                 openGallery();
             } else {
                 Toast.makeText(this, "Izin akses galeri ditolak", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                Toast.makeText(this, "Izin akses kamera ditolak", Toast.LENGTH_SHORT).show();
             }
         }
     }

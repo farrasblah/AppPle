@@ -22,13 +22,7 @@
         android:theme="@style/Theme.Apel_ppb"
         tools:targetApi="31">
         <activity
-            android:name=".CareTipsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DiseasesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".VarietiesActivity"
+            android:name=".ArticleFilterActivity"
             android:exported="false" />
         <activity
             android:name=".LearnMoreActivity"
@@ -43,9 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HealthyAppleInfoActivity" />
-        <activity android:name=".RottenAppleInfoActivity" />
-        <activity android:name=".ScabbyAppleInfoActivity" />
         <activity android:name=".CheckingImages" />
 
         <provider
