@@ -11,7 +11,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.provider.MediaStore;
@@ -31,12 +30,7 @@ import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
+import okhttp3.*;
 
 public class CheckingImages extends AppCompatActivity {
 
@@ -56,7 +50,6 @@ public class CheckingImages extends AppCompatActivity {
         imageView = findViewById(R.id.image_preview);
         Button scanButton = findViewById(R.id.button_scan);
         Button editButton = findViewById(R.id.button_edit);
-        ImageButton backButton = findViewById(R.id.back_button);
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -113,36 +106,6 @@ public class CheckingImages extends AppCompatActivity {
                 scanImage(imageUri);
             }
         });
-<<<<<<< HEAD
-
-        editButton.setOnClickListener(v -> {
-            if ("camera".equals(source)) {
-                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                photoFile = null;
-                try {
-                    photoFile = createImageFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-                if (photoFile != null) {
-                    imageUri = FileProvider.getUriForFile(this,
-                            getPackageName() + ".provider",
-                            photoFile);
-                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                    cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    cameraLauncher.launch(cameraIntent);
-                }
-            } else if ("gallery".equals(source)) {
-                Intent intentGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intentGallery.setType("image/*");
-                galleryLauncher.launch(intentGallery);
-            }
-        });
-
-        backButton.setOnClickListener(v -> finish()); // Navigate back to previous activity
-=======
->>>>>>> f6c74c0c046d00cb1a08f6265fe28e6471760277
     }
 
     private void scanImage(Uri uri) {
@@ -210,12 +173,21 @@ public class CheckingImages extends AppCompatActivity {
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(10f);
 
-<<<<<<< HEAD
+            float originalWidth = (float) imageInfo.getInt("width");
+            float originalHeight = (float) imageInfo.getInt("height");
+            float scaleX = bitmap.getWidth() / originalWidth;
+            float scaleY = bitmap.getHeight() / originalHeight;
+
             if (predictions.length() == 0) {
-                // Jika tidak ada deteksi
-                paint.setColor(Color.BLACK);
-                paint.setTextSize(200f);
-                canvas.drawText("Oops! No apple detected", bitmap.getWidth() / 4, bitmap.getHeight() / 2, paint);
+                // Display "Ops! No Apple Found!" message
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.WHITE);
+                paint.setTextSize(100f);
+                float textWidth = paint.measureText("Ops! No Apple Found!");
+                canvas.drawText("Ops! No Apple Found!",
+                        (bitmap.getWidth() - textWidth) / 2,
+                        bitmap.getHeight() / 2,
+                        paint);
             } else {
                 for (int i = 0; i < predictions.length(); i++) {
                     JSONObject prediction = predictions.getJSONObject(i);
@@ -225,34 +197,20 @@ public class CheckingImages extends AppCompatActivity {
                     float height = (float) prediction.getDouble("height");
                     String className = prediction.getString("class");
                     float confidence = (float) prediction.getDouble("confidence");
-=======
-            float originalWidth = (float) imageInfo.getInt("width");
-            float originalHeight = (float) imageInfo.getInt("height");
-            float scaleX = bitmap.getWidth() / originalWidth;
-            float scaleY = bitmap.getHeight() / originalHeight;
->>>>>>> f6c74c0c046d00cb1a08f6265fe28e6471760277
 
-            for (int i = 0; i < predictions.length(); i++) {
-                JSONObject prediction = predictions.getJSONObject(i);
-                float x = (float) prediction.getDouble("x");
-                float y = (float) prediction.getDouble("y");
-                float width = (float) prediction.getDouble("width");
-                float height = (float) prediction.getDouble("height");
-                String className = prediction.getString("class");
-                float confidence = (float) prediction.getDouble("confidence");
+                    float left = (x - width / 2) * scaleX;
+                    float top = (y - height / 2) * scaleY;
+                    float right = (x + width / 2) * scaleX;
+                    float bottom = (y + height / 2) * scaleY;
 
-                float left = (x - width / 2) * scaleX;
-                float top = (y - height / 2) * scaleY;
-                float right = (x + width / 2) * scaleX;
-                float bottom = (y + height / 2) * scaleY;
+                    paint.setColor("sehat".equals(className) ? Color.GREEN : Color.RED);
+                    RectF rect = new RectF(left, top, right, bottom);
+                    canvas.drawRect(rect, paint);
 
-                paint.setColor("sehat".equals(className) ? Color.GREEN : Color.RED);
-                RectF rect = new RectF(left, top, right, bottom);
-                canvas.drawRect(rect, paint);
-
-                paint.setColor(Color.WHITE);
-                paint.setTextSize(80f);
-                canvas.drawText(String.format("%s (%.2f%%)", className, confidence * 100), left, top - 20, paint);
+                    paint.setColor(Color.WHITE);
+                    paint.setTextSize(80f);
+                    canvas.drawText(String.format("%s (%.2f%%)", className, confidence * 100), left, top - 20, paint);
+                }
             }
 
             runOnUiThread(() -> imageView.setImageBitmap(mutableBitmap));

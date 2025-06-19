@@ -38,12 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
-=======
-<!--        <activity android:name=".HealthyAppleInfoActivity" />-->
-<!--        <activity android:name=".RottenAppleInfoActivity" />-->
-<!--        <activity android:name=".ScabbyAppleInfoActivity" />-->
->>>>>>> f6c74c0c046d00cb1a08f6265fe28e6471760277
         <activity android:name=".CheckingImages" />
 
         <provider
